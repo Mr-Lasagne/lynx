@@ -7,7 +7,11 @@ requires-python = ">=3.13"
 dependencies = ["numpy>=2.3.2", "pandas>=2.3.2"]
 
 [dependency-groups]
-dev = ["ruff>=0.12.12"]
+dev = [
+    "commitizen>=4.8.4",
+    "pre-commit>=4.3.0",
+    "ruff>=0.12.12",
+]
 
 [tool.ruff.lint]
 select = ["ALL"]
