@@ -4,7 +4,7 @@ import configparser
 import getpass
 import os
 import sys
-import tkinter
+import tkinter as tk
 from tkinter import filedialog, ttk
 
 import numpy as np
@@ -113,7 +113,7 @@ class ClericalApp:
 
         # Create the canvas and scrollbars. Attach the scrollbar
         # functionality to the canvas.
-        self.canvas = tkinter.Canvas(self.record_container)
+        self.canvas = tk.Canvas(self.record_container)
         self.vertical_scrollbar = ttk.Scrollbar(
             self.record_container, orient="vertical", command=self.canvas.yview
         )
@@ -244,7 +244,7 @@ class ClericalApp:
         self.draw_button_frame()
         self.draw_tool_frame()
 
-    def _on_record_frame_configure(self, event: tkinter.Event) -> None:
+    def _on_record_frame_configure(self, event: tk.Event) -> None:
         """Ensure scrollregion is as tall as the canvas."""
         x1, y1, x2, y2 = self.canvas.bbox("all")
         canvas_height = self.canvas.winfo_height()
@@ -264,7 +264,7 @@ class ClericalApp:
     def draw_button_frame(self):
         # =====  button_frame - for match/non-match/back buttons
 
-        self.match_button = tkinter.Button(
+        self.match_button = tk.Button(
             self.button_frame,
             text="Match",
             font=f"Helvetica {self.text_size}",
@@ -272,7 +272,7 @@ class ClericalApp:
             bg="DarkSeaGreen1",
         )
         self.match_button.grid(row=0, column=0, columnspan=1, padx=15, pady=10)
-        self.non_match_button = tkinter.Button(
+        self.non_match_button = tk.Button(
             self.button_frame,
             text="No more matches",
             font=f"Helvetica {self.text_size}",
@@ -281,7 +281,7 @@ class ClericalApp:
         )
         self.non_match_button.grid(row=0, column=1, columnspan=1, padx=15, pady=10)
 
-        self.back_button = tkinter.Button(
+        self.back_button = tk.Button(
             self.button_frame,
             text="Back",
             font=f"Helvetica {self.text_size}",
@@ -291,7 +291,7 @@ class ClericalApp:
 
         # disable back button if no previous clusters exist
         if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
-            self.back_button.config(state=tkinter.DISABLED)
+            self.back_button.config(state=tk.DISABLED)
 
         # Add in the comment widget based on config option
         if int(config["custom_settings"]["commentbox"]):
@@ -342,7 +342,7 @@ class ClericalApp:
         )
 
         # Highlighter.
-        self.highlighter_button = tkinter.Checkbutton(
+        self.highlighter_button = tk.Checkbutton(
             self.tool_frame,
             indicatoron=False,
             selectcolor="white",
@@ -352,7 +352,7 @@ class ClericalApp:
         )
         self.highlighter_button.grid(row=0, column=2, padx=5, pady=5)
 
-        self.text_smaller_button = tkinter.Button(
+        self.text_smaller_button = tk.Button(
             self.tool_frame,
             font=f"Helvetica {self.text_size}",
             text="A-",
@@ -362,7 +362,7 @@ class ClericalApp:
         )
         self.text_smaller_button.grid(row=0, column=4, sticky="e", pady=5)
 
-        self.text_bigger_button = tkinter.Button(
+        self.text_bigger_button = tk.Button(
             self.tool_frame,
             font=f"Helvetica {self.text_size}",
             text="A+",
@@ -373,7 +373,7 @@ class ClericalApp:
         self.text_bigger_button.grid(row=0, column=5, sticky="w", pady=5, padx=2)
 
         # Make text bold button.
-        self.bold_button = tkinter.Button(
+        self.bold_button = tk.Button(
             self.tool_frame,
             text="B",
             font=f"Helvetica {self.text_size} bold",
@@ -384,7 +384,7 @@ class ClericalApp:
         self.bold_button.grid(row=0, column=6, sticky="w", pady=5)
 
         # Save and close button.
-        self.save_button = tkinter.Button(
+        self.save_button = tk.Button(
             self.tool_frame,
             text="Save and Close",
             font=f"Helvetica {self.text_size}",
@@ -404,7 +404,7 @@ class ClericalApp:
 
         # Except when matching is completed.
         except TypeError:
-            tkinter.messagebox.showinfo(
+            tk.messagebox.showinfo(
                 title="Matching completed",
                 message="Please select a different file to clerically match",
             )
@@ -430,7 +430,7 @@ class ClericalApp:
             )
 
             exec(
-                f"self.{column_title}.grid(row=1,column=n+1,columnspan=1, sticky = tkinter.W,\
+                f"self.{column_title}.grid(row=1,column=n+1,columnspan=1, sticky = tk.W,\
                                             padx=10, pady=3)"
             )
 
@@ -476,7 +476,7 @@ class ClericalApp:
 
                 # create a text label
                 exec(
-                    f'self.{col_header[0]}row{v} = tkinter.Text(self.record_frame,\
+                    f'self.{col_header[0]}row{v} = tk.Text(self.record_frame,\
                                                             height=1,relief="flat",bg="gray93")'
                 )
 
@@ -489,7 +489,7 @@ class ClericalApp:
                 exec(
                     f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}])+10,\
                                                          font=f"Helvetica {self.text_size} {self.text_bold}",\
-                                                         state=tkinter.DISABLED)'
+                                                         state=tk.DISABLED)'
                 )
 
                 # grid the text label to the widget.
@@ -499,9 +499,9 @@ class ClericalApp:
                 )
 
                 # create a checkbutton and append it to the list of checkbutton variables.
-                exec(f"self.check_{v}= tkinter.IntVar()")
+                exec(f"self.check_{v}= tk.IntVar()")
                 exec(
-                    f"self.checkbutton{v}=tkinter.Checkbutton(self.record_frame,\
+                    f"self.checkbutton{v}=tk.Checkbutton(self.record_frame,\
                                                           variable=self.check_{v})"
                 )
                 exec(f"self.checkbutton{v}.deselect()")
@@ -522,11 +522,11 @@ class ClericalApp:
 
                 # if match column not populated yet, keep checkbutton clickable
                 if working_file.loc[display_i, "Match"] == "":
-                    exec(f"self.checkbutton{v}.config(state=tkinter.NORMAL)")
+                    exec(f"self.checkbutton{v}.config(state=tk.NORMAL)")
 
                 # else make it unclickable
                 else:
-                    exec(f"self.checkbutton{v}.config(state=tkinter.DISABLED)")
+                    exec(f"self.checkbutton{v}.config(state=tk.DISABLED)")
 
                 row_num += 2
                 sep_row += 2
@@ -566,11 +566,11 @@ class ClericalApp:
 
         # clear commentbox entry
         if int(config["custom_settings"]["commentbox"]):
-            self.comment_entry.delete(0, tkinter.END)
+            self.comment_entry.delete(0, tk.END)
 
         # disable back button if no previous clusters exist
         if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
-            self.back_button.config(state=tkinter.DISABLED)
+            self.back_button.config(state=tk.DISABLED)
         else:
             self.back_button.config(state="normal")
 
@@ -675,7 +675,7 @@ class ClericalApp:
             for i in self.display_indexes:
                 # if 1 or 0 records are selected, present user with warning
                 if len(checkboxes_selected) <= 2:
-                    tkinter.messagebox.showwarning(
+                    tk.messagebox.showwarning(
                         message="Two or more records must be selected to make a match"
                     )
 
@@ -786,8 +786,8 @@ class ClericalApp:
         # Query whether the current record matches the total number of records
         if self.cluster_index > (self.num_clusters - 1):
             # disable the match and Non-match buttons
-            self.match_button.configure(state=tkinter.DISABLED)
-            self.non_match_button.configure(state=tkinter.DISABLED)
+            self.match_button.configure(state=tk.DISABLED)
+            self.non_match_button.configure(state=tk.DISABLED)
             # inform the user that matching is finished
             self.matchdone = ttk.Label(
                 root, text="Matching Finished. Press save and close.", foreground="red"
@@ -826,7 +826,7 @@ class ClericalApp:
             # close down the app
             root.destroy()
         except PermissionError:
-            tkinter.messagebox.showwarning(
+            tk.messagebox.showwarning(
                 message="This clerical sample is already open in another program. Please close that program."
             )
 
@@ -1052,7 +1052,7 @@ class ClericalApp:
         """
         # if they click yes
 
-        if tkinter.messagebox.askyesno(
+        if tk.messagebox.askyesno(
             "Exit", "Are you sure you want to exit WITHOUT saving?"
         ):
             # check if this is the first time they are accessing it
@@ -1090,7 +1090,7 @@ if __name__ == "__main__":
 
     # ===================== Open Intro GUI
     # Open a file pen dialog box, allow user to choose file, then grab user credentials
-    root = tkinter.Tk()
+    root = tk.Tk()
     # Run the Intro GUI
     intro = IntroWindow(root, initdir, filetypes)
 
@@ -1151,7 +1151,7 @@ if __name__ == "__main__":
             filepath_done = f"{'/'.join(renamed_file.split('/')[:-1])}/{renamed_file.split('/')[-1][0:-15]}_DONE.{renamed_file.split('/')[-1].split('.')[-1]}"
 
     except PermissionError:
-        tkinter.messagebox.showwarning(
+        tk.messagebox.showwarning(
             message="This clerical sample is open in another program. Please close this and restart CROW."
         )
 
@@ -1188,7 +1188,7 @@ if __name__ == "__main__":
     # Step 3:
     # Run the Clerical Matching Application
 
-    root = tkinter.Tk()
+    root = tk.Tk()
     mainWindow = ClericalApp(root, working_file, filepath_done, renamed_file, config)
     root.mainloop()
 
