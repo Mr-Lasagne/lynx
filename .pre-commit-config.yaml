@@ -1,4 +1,14 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: name-tests-test
+        args: [--pytest-test-first]
+      - id: trailing-whitespace
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.8.4
     hooks:
