@@ -1,7 +1,7 @@
 [project]
 name = "lynx"
 version = "0.1.0"
-description = "Add your description here"
+description = "A desktop app to facilitate the clerical review of linked data."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = ["numpy>=2.3.2", "pandas>=2.3.2"]
