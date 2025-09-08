@@ -6,6 +6,7 @@ import os
 import sys
 import tkinter as tk
 from tkinter import filedialog, ttk
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -52,7 +53,13 @@ class IntroWindow(tk.Tk):
 class ClericalApp(tk.Tk):
     """A window that allows users to clerically review records."""
 
-    def __init__(self, working_file, filename_done, filename_old, config):
+    def __init__(
+        self,
+        working_file: pd.DataFrame,
+        filename_done: str,
+        filename_old: str,
+        config: configparser.ConfigParser,
+    ) -> None:
         """Initialise the main clerical app window."""
         super().__init__()
 
@@ -232,7 +239,7 @@ class ClericalApp(tk.Tk):
             else:
                 pass
 
-    def draw_button_frame(self):
+    def draw_button_frame(self) -> None:
         """Create the widgets that go in the button frame."""
         self.match_button = tk.Button(
             self.button_frame,
@@ -296,7 +303,7 @@ class ClericalApp(tk.Tk):
                     config["custom_settings"]["comment_values"]
                 ).split(",")
 
-    def draw_tool_frame(self):
+    def draw_tool_frame(self) -> None:
         """Create the tool widgets and populate the tool frame."""
         # Configure the grid so the record counter can move to the right
         # of the tool frame.
@@ -381,7 +388,9 @@ class ClericalApp(tk.Tk):
             # Close down the application.
             self.destroy()
 
-    def draw_recordframe(self, config, working_file):
+    def draw_recordframe(
+        self, config: configparser.ConfigParser, working_file: pd.DataFrame
+    ) -> None:
         """Create the record frame widgets and populate the record frame."""
         num_match_cols = 0
         # Create column header labels and place all them on row 1,
@@ -506,7 +515,9 @@ class ClericalApp(tk.Tk):
                 row_num += 2
                 sep_row += 2
 
-    def update_gui(self, config, working_file):
+    def update_gui(
+        self, config: configparser.ConfigParser, working_file: pd.DataFrame
+    ) -> None:
         """Update the GUI labels based on the record values.
 
         This function is called whenever the app is interacted with,
@@ -543,7 +554,9 @@ class ClericalApp(tk.Tk):
         if self.show_hide_diff == 1:
             self.show_hide_differences(0)
 
-    def make_text_bold(self, config, working_file):
+    def make_text_bold(
+        self, config: configparser.ConfigParser, working_file: pd.DataFrame
+    ) -> None:
         """Toggle bold font."""
         if not self.text_bold_boolean:
             self.text_bold_boolean = 1
@@ -555,7 +568,7 @@ class ClericalApp(tk.Tk):
 
         self.update_gui(config, working_file)
 
-    def get_matches(self):
+    def get_matches(self) -> None:
         """Generate a string based on the matches in a cluster."""
         # Create, as a local variable, the list of matches within the
         # current cluster.
@@ -577,7 +590,7 @@ class ClericalApp(tk.Tk):
             )
             self.match_string = self.match_string + temp_string
 
-    def current_num_cluster_decisions(self):
+    def current_num_cluster_decisions(self) -> int:
         """Calculate how many records in the cluster have been reviewed.
 
         Returns
@@ -598,7 +611,7 @@ class ClericalApp(tk.Tk):
 
         return current_num_cluster_decisions
 
-    def update_df(self, event):
+    def update_df(self, event: int) -> None:
         """Write the review decision to the DataFrame.
 
         Parameters
@@ -678,7 +691,7 @@ class ClericalApp(tk.Tk):
                     if int(config["custom_settings"]["commentbox"]):
                         working_file.loc[i, "Comments"] = self.comment_entry.get()
 
-    def go_back(self):
+    def go_back(self) -> None:
         """Go back to the previous cluster."""
         # Get the number of decisions made in the current cluster.
         num_decisions = self.current_num_cluster_decisions()
@@ -716,7 +729,7 @@ class ClericalApp(tk.Tk):
         except AttributeError:
             pass
 
-    def check_matching_done(self):
+    def check_matching_done(self) -> Literal[1, 0]:
         """Check if the review is complete.
 
         Check if the number of iterations is greater than the number of
@@ -743,7 +756,7 @@ class ClericalApp(tk.Tk):
         else:
             return 0
 
-    def save_and_close(self):
+    def save_and_close(self) -> None:
         """Save the working_file DataFrame and close the GUI."""
         try:
             # Check whether matching has now finished (i.e. they have
@@ -769,7 +782,7 @@ class ClericalApp(tk.Tk):
                 "\nThis clerical sample is already open in another program. Please close that program."
             )
 
-    def show_hide_differences(self, toggle):
+    def show_hide_differences(self, toggle: int) -> None:
         """Toggle the highlighting of differences between records.
 
         Parameters
@@ -890,7 +903,7 @@ class ClericalApp(tk.Tk):
 
             self.show_hide_diff = 0
 
-    def update_index(self, event):
+    def update_index(self, event: int) -> None:
         """Update the working file index.
 
         Also direct other functions to update the working file and the
@@ -948,7 +961,7 @@ class ClericalApp(tk.Tk):
                 # Update the GUI.
                 self.update_gui(config, working_file)
 
-    def change_text_size(self, size_change):
+    def change_text_size(self, size_change: int) -> None:
         """Adjust the size of the font.
 
         Parameters
@@ -966,7 +979,7 @@ class ClericalApp(tk.Tk):
         # Update the GUI.
         self.update_gui(config, working_file)
 
-    def on_exit(self):
+    def on_exit(self) -> None:
         """Prompt the user to save and exit."""
         # If they click yes.
         if tk.messagebox.askyesno(
