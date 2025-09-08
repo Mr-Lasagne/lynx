@@ -14,44 +14,38 @@ import pandas as pd
 class IntroWindow(tk.Tk):
     """A window that prompts the user to choose a CSV file."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise the intro window."""
         super().__init__()
 
-        self.geometry("400x225")
-        self.title("Clerical Matching")
-        self.eval("tk::PlaceWindow . center")
+        # Set the window title.
+        self.title("lynx")
 
-        # Initialise the frame.
-        self.content = ttk.Frame(self)
-        self.frame = ttk.Frame(
-            self.content, borderwidth=5, relief="ridge", width=500, height=300
-        )
-        self.content.grid(column=0, row=0)
-        self.frame.grid(column=0, row=0, columnspan=5, rowspan=5)
+        # Initialise the intro window content container.
+        self.intro_container = ttk.Frame(self)
+        self.intro_container.pack(padx=10)
 
-        # Create some widgets and place them on the GUI.
+        # Create some widgets and pack them on the GUI.
         self.intro_text = ttk.Label(
-            self.content,
+            self.intro_container,
             text=(
-                'Welcome to the Clerical Matching Application. \nPlease click "Choose File" to select your file \nand begin matching.'
+                "Welcome to the Clerical Matching Application. \n"
+                'Please click "Choose File" to select your file \n'
+                "and begin matching."
             ),
-            font="Helvetica 10",
+            font=("Helvetica", 10),
         )
-        self.intro_text.grid(row=1, column=0, columnspan=4)
+        self.intro_text.pack(pady=(10, 5))
 
-        # Create the button.
-        self.choose_file_button = ttk.Button(
-            self.content, text="Choose File", command=lambda: self.choose_csv()
+        # Create the file choice button.
+        self.choose_csv_button = ttk.Button(
+            self.intro_container, text="Choose CSV", command=self.choose_csv
         )
-        self.choose_file_button.grid(row=2, column=1, sticky="new")
+        self.choose_csv_button.pack(pady=(5, 10))
 
     def choose_csv(self) -> None:
         """Open a file select window and close the intro window."""
-        self.csv_file = filedialog.askopenfilename(
-            title="Please select a file:",
-            filetypes=[("csv files", "*.csv")],
-        )
+        self.csv_file = filedialog.askopenfilename(filetypes=[("csv files", "*.csv")])
         self.destroy()
 
 
