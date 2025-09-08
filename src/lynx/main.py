@@ -163,7 +163,7 @@ class ClericalApp(tk.Tk):
         working_file.fillna("", inplace=True)
 
         # A counter of the number of checkpoint saves.
-        self.checkpointcounter = 0
+        self.checkpoint_counter = 0
 
         # Create a sequential cluster ID number from the cluster ID
         # variable.
@@ -220,7 +220,7 @@ class ClericalApp(tk.Tk):
         self.non_iterated_labels = []
         self.iterated_labels = []
 
-        self.draw_recordframe(config, working_file)
+        self.draw_record_frame(config, working_file)
         self.draw_button_frame()
         self.draw_tool_frame()
 
@@ -271,7 +271,7 @@ class ClericalApp(tk.Tk):
             self.back_button.config(state=tk.DISABLED)
 
         # Add in the comment widget based on the configuration option.
-        if int(config["custom_settings"]["commentbox"]):
+        if int(config["custom_settings"]["comment_box"]):
             # Create 'Comments' column if one does not exist.
             if "Comments" not in working_file:
                 working_file["Comments"] = ""
@@ -388,7 +388,7 @@ class ClericalApp(tk.Tk):
             # Close down the application.
             self.destroy()
 
-    def draw_recordframe(
+    def draw_record_frame(
         self, config: configparser.ConfigParser, working_file: pd.DataFrame
     ) -> None:
         """Create the record frame widgets and populate the record frame."""
@@ -534,12 +534,12 @@ class ClericalApp(tk.Tk):
             widget.destroy()
 
         # Redraw everything in the frames.
-        self.draw_recordframe(config, working_file)
+        self.draw_record_frame(config, working_file)
         self.draw_button_frame()
         self.draw_tool_frame()
 
         # Clear the comment box entry.
-        if int(config["custom_settings"]["commentbox"]):
+        if int(config["custom_settings"]["comment_box"]):
             self.comment_entry.delete(0, tk.END)
 
         # Disable the back button if no previous clusters exist.
@@ -657,11 +657,11 @@ class ClericalApp(tk.Tk):
                         except ValueError:
                             pass
 
-                        # If 'commentbox' is specified in the
+                        # If 'comment_box' is specified in the
                         # configuration file.
-                        if int(config["custom_settings"]["commentbox"]):
+                        if int(config["custom_settings"]["comment_box"]):
                             # For each row where a checkbox selected,
-                            # append the commentbox contents.
+                            # append the comment_box contents.
                             working_file.loc[i, "Comments"] = self.comment_entry.get()
 
                     # Append those not selected by a checkbutton to a
@@ -686,9 +686,9 @@ class ClericalApp(tk.Tk):
                 if working_file.loc[i, "Match"] == "":
                     working_file.loc[i, "Match"] = "No match in cluster"
 
-                    # If the commentbox is specified in the
+                    # If the comment_box is specified in the
                     # configuration file.
-                    if int(config["custom_settings"]["commentbox"]):
+                    if int(config["custom_settings"]["comment_box"]):
                         working_file.loc[i, "Comments"] = self.comment_entry.get()
 
     def go_back(self) -> None:
@@ -986,7 +986,7 @@ class ClericalApp(tk.Tk):
             "Exit", "Are you sure you want to exit WITHOUT saving?"
         ):
             # Check if this is the first time they are accessing it.
-            if not self.matching_previously_began & self.checkpointcounter == 0:
+            if not self.matching_previously_began & self.checkpoint_counter == 0:
                 # Then rename the file removing their username and
                 # 'inProgress' tag
                 os.rename(
