@@ -45,42 +45,42 @@ class IntroWindow(tk.Tk):
 
     def choose_csv(self) -> None:
         """Open a file select window and close the intro window."""
-        self.csv_file = filedialog.askopenfilename(filetypes=[("csv files", "*.csv")])
+        self.csv_file = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         self.destroy()
 
 
-class ClericalApp:
+class ClericalApp(tk.Tk):
     """A window that allows users to clerically review records."""
 
-    def __init__(self, root, working_file, filename_done, filename_old, config):
+    def __init__(self, working_file, filename_done, filename_old, config):
         """Initialise the main clerical app window."""
-        self.root = root
+        super().__init__()
+
+        # Initialise the file name variables.
         self.filename_done = filename_done
         self.filename_old = filename_old
 
         # Set the window title.
-        root.title("Clerical Matching")
+        self.title("Clerical Matching")
 
         # Set the window size to 90% of screen width and 50% of screen
         # height.
-        width = int(self.root.winfo_screenwidth() * 0.9)
-        height = int(self.root.winfo_screenheight() * 0.5)
-        self.root.geometry(f"{width}x{height}")
+        width = int(self.winfo_screenwidth() * 0.9)
+        height = int(self.winfo_screenheight() * 0.5)
+        self.geometry(f"{width}x{height}")
 
         # Configure the grid layout to make sure the record frame can
         # expand to fill the window.
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         # Create the tool frame.
-        self.tool_frame = ttk.LabelFrame(root, text="Tools:")
-        self.tool_frame.grid(
-            row=0, column=0, columnspan=1, sticky="ew", padx=10, pady=10
-        )
+        self.tool_frame = ttk.LabelFrame(self, text="Tools:")
+        self.tool_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
 
         # Create a container to hold the scrollable canvas that will
         # contain the record frame.
-        self.record_container = ttk.Labelframe(root, text="Records")
+        self.record_container = ttk.Labelframe(self, text="Records")
         self.record_container.grid(row=1, column=0, padx=10, sticky="nsew")
 
         # Create the canvas and scrollbars, and attach the scrollbar
@@ -119,7 +119,7 @@ class ClericalApp:
         )
 
         # Create the button frame.
-        self.button_frame = ttk.Frame(root)
+        self.button_frame = ttk.Frame(self)
         self.button_frame.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
 
         # Create a list of record IDs that have not been matched yet.
@@ -127,7 +127,7 @@ class ClericalApp:
 
         # Create a protocol for if the user presses the 'X' button (top
         # right).
-        root.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
 
         # If a 'Match' column exists in the clerical file.
         if {"Match"}.issubset(working_file.columns):
@@ -379,7 +379,7 @@ class ClericalApp:
             )
 
             # Close down the application.
-            root.destroy()
+            self.destroy()
 
     def draw_recordframe(self, config, working_file):
         """Create the record frame widgets and populate the record frame."""
@@ -735,7 +735,7 @@ class ClericalApp:
             self.non_match_button.configure(state=tk.DISABLED)
             # Inform the user that matching is finished.
             self.matchdone = ttk.Label(
-                root, text="Matching Finished. Press save and close.", foreground="red"
+                self, text="Matching Finished. Press save and close.", foreground="red"
             )
             self.matchdone.grid(row=1, column=0, columnspan=1)
 
@@ -759,7 +759,7 @@ class ClericalApp:
                 working_file.to_csv(self.filename_old, index=False)
 
             # Close down the app.
-            root.destroy()
+            self.destroy()
         except PermissionError:
             tk.messagebox.showwarning(
                 message="This clerical sample is already open in another program. Please close that program."
@@ -981,7 +981,7 @@ class ClericalApp:
                     "_".join(self.filename_old.split("_")[0:-2]) + ".csv",
                 )
 
-            root.destroy()
+            self.destroy()
 
 
 if __name__ == "__main__":
@@ -1078,9 +1078,8 @@ if __name__ == "__main__":
 
     working_file = working_file.drop(columns="duplicated_record")
 
-    root = tk.Tk()
-    mainWindow = ClericalApp(root, working_file, filepath_done, renamed_file, config)
-    root.mainloop()
+    app = ClericalApp(working_file, filepath_done, renamed_file, config)
+    app.mainloop()
 
     print(
         "\n Number of records matched:",
