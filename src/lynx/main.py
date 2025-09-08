@@ -5,7 +5,6 @@ import getpass
 import os
 import sys
 import tkinter as tk
-from pathlib import Path
 from tkinter import filedialog, ttk
 
 import numpy as np
@@ -15,15 +14,13 @@ import pandas as pd
 class IntroWindow(tk.Tk):
     """A window that prompts the user to choose a CSV file."""
 
-    def __init__(self, files_info):
+    def __init__(self):
         """Initialise the intro window."""
         super().__init__()
 
         self.geometry("400x225")
         self.title("Clerical Matching")
         self.eval("tk::PlaceWindow . center")
-
-        self.files_info = files_info
 
         # Initialise the frame.
         self.content = ttk.Frame(self)
@@ -53,7 +50,7 @@ class IntroWindow(tk.Tk):
         """Open a file select window and close the intro window."""
         self.csv_file = filedialog.askopenfilename(
             title="Please select a file:",
-            filetypes=self.files_info,
+            filetypes=[("csv files", "*.csv")],
         )
         self.destroy()
 
@@ -998,15 +995,11 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    # Specify file types - this will only show these files when the
-    # dialog box opens up.
-    filetypes = (("csv files", "*.csv"),)
-
     # Grab user credentials.
     user = getpass.getuser()
 
     # Run the Intro GUI.
-    intro_window = IntroWindow(filetypes)
+    intro_window = IntroWindow()
     intro_window.mainloop()
 
     # Create file path variables, load in the selected data, and specify
