@@ -5,6 +5,7 @@ import getpass
 import os
 import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog, ttk
 
 import numpy as np
@@ -14,7 +15,7 @@ import pandas as pd
 class IntroWindow(tk.Tk):
     """A window that prompts the user to choose a CSV file."""
 
-    def __init__(self, init_dir, files_info):
+    def __init__(self, files_info):
         """Initialise the intro window."""
         super().__init__()
 
@@ -22,7 +23,6 @@ class IntroWindow(tk.Tk):
         self.title("Clerical Matching")
         self.eval("tk::PlaceWindow . center")
 
-        self.init_dir = init_dir
         self.files_info = files_info
 
         # Initialise the frame.
@@ -45,14 +45,13 @@ class IntroWindow(tk.Tk):
 
         # Create the button.
         self.choose_file_button = ttk.Button(
-            self.content, text="Choose File", command=lambda: self.open_dirfinder()
+            self.content, text="Choose File", command=lambda: self.choose_csv()
         )
         self.choose_file_button.grid(row=2, column=1, sticky="new")
 
-    def open_dirfinder(self):
+    def choose_csv(self) -> None:
         """Open a file select window and close the intro window."""
-        self.fileselect = filedialog.askopenfilename(
-            initialdir=self.init_dir,
+        self.csv_file = filedialog.askopenfilename(
             title="Please select a file:",
             filetypes=self.files_info,
         )
@@ -999,9 +998,6 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    # Get the initial directory.
-    initdir = config["matching_files_details"]["file_pathway"]
-
     # Specify file types - this will only show these files when the
     # dialog box opens up.
     filetypes = (("csv files", "*.csv"),)
@@ -1010,7 +1006,7 @@ if __name__ == "__main__":
     user = getpass.getuser()
 
     # Run the Intro GUI.
-    intro_window = IntroWindow(initdir, filetypes)
+    intro_window = IntroWindow(filetypes)
     intro_window.mainloop()
 
     # Create file path variables, load in the selected data, and specify
@@ -1018,11 +1014,11 @@ if __name__ == "__main__":
     try:
         # Check if the user running it has matched records in this file
         # before.
-        if "inProgress" in intro_window.fileselect.split("/")[-1]:
+        if "inProgress" in intro_window.csv_file.split("/")[-1]:
             # If it is the same user.
-            if user in intro_window.fileselect.split("/")[-1]:
+            if user in intro_window.csv_file.split("/")[-1]:
                 # Do not rename the file.
-                renamed_file = intro_window.fileselect
+                renamed_file = intro_window.csv_file
 
                 # Create the file path name for when the file is
                 # finished.
@@ -1030,36 +1026,36 @@ if __name__ == "__main__":
 
             else:
                 # Rename the file to contain the additional user.
-                renamed_file = f"{'/'.join(intro_window.fileselect.split('/')[:-1])}/{intro_window.fileselect.split('/')[-1].split('.')[0][0:-11]}_{user}_inProgress.{intro_window.fileselect.split('/')[-1].split('.')[-1]}"
-                os.rename(rf"{intro_window.fileselect}", rf"{renamed_file}")
+                renamed_file = f"{'/'.join(intro_window.csv_file.split('/')[:-1])}/{intro_window.csv_file.split('/')[-1].split('.')[0][0:-11]}_{user}_inProgress.{intro_window.csv_file.split('/')[-1].split('.')[-1]}"
+                os.rename(rf"{intro_window.csv_file}", rf"{renamed_file}")
 
                 # Create the filepath name for when the file is
                 # finished.
                 filepath_done = f"{'/'.join(renamed_file.split('/')[:-1])}/{renamed_file.split('/')[-1][0:-15]}_DONE.{renamed_file.split('/')[-1].split('.')[-1]}"
 
         # If a user is picking this file again and its done.
-        elif "DONE" in intro_window.fileselect.split("/")[-1]:
+        elif "DONE" in intro_window.csv_file.split("/")[-1]:
             # If it is the same user.
-            if user in intro_window.fileselect.split("/")[-1]:
+            if user in intro_window.csv_file.split("/")[-1]:
                 # Do not change file path done - keep it as it is.
-                filepath_done = intro_window.fileselect
+                filepath_done = intro_window.csv_file
 
                 # Rename the file.
-                renamed_file = f"{'/'.join(intro_window.fileselect.split('/')[:-1])}/{intro_window.fileselect.split('/')[-1][0:-9]}_inProgress.{intro_window.fileselect.split('/')[-1].split('.')[-1]}"
-                os.rename(rf"{intro_window.fileselect}", rf"{renamed_file}")
+                renamed_file = f"{'/'.join(intro_window.csv_file.split('/')[:-1])}/{intro_window.csv_file.split('/')[-1][0:-9]}_inProgress.{intro_window.csv_file.split('/')[-1].split('.')[-1]}"
+                os.rename(rf"{intro_window.csv_file}", rf"{renamed_file}")
             # If it is a different user.
             else:
                 # Rename the file to include the additional user.
-                renamed_file = f"{'/'.join(intro_window.fileselect.split('/')[:-1])}/{intro_window.fileselect.split('/')[-1].split('.')[0][0:-5]}_{user}_inProgress.{intro_window.fileselect.split('/')[-1].split('.')[-1]}"
-                os.rename(rf"{intro_window.fileselect}", rf"{renamed_file}")
+                renamed_file = f"{'/'.join(intro_window.csv_file.split('/')[:-1])}/{intro_window.csv_file.split('/')[-1].split('.')[0][0:-5]}_{user}_inProgress.{intro_window.csv_file.split('/')[-1].split('.')[-1]}"
+                os.rename(rf"{intro_window.csv_file}", rf"{renamed_file}")
 
                 # Create the filepath done.
                 filepath_done = f"{'/'.join(renamed_file.split('/')[:-1])}/{renamed_file.split('/')[-1][0:-15]}_DONE.{renamed_file.split('/')[-1].split('.')[-1]}"
         else:
             # Resave this file with the user ID and '_inProgress' at the
             # end so no one else selects it.
-            renamed_file = f"{'/'.join(intro_window.fileselect.split('/')[:-1])}/{intro_window.fileselect.split('/')[-1].split('.')[0]}_{user}_inProgress.{intro_window.fileselect.split('/')[-1].split('.')[-1]}"
-            os.rename(rf"{intro_window.fileselect}", rf"{renamed_file}")
+            renamed_file = f"{'/'.join(intro_window.csv_file.split('/')[:-1])}/{intro_window.csv_file.split('/')[-1].split('.')[0]}_{user}_inProgress.{intro_window.csv_file.split('/')[-1].split('.')[-1]}"
+            os.rename(rf"{intro_window.csv_file}", rf"{renamed_file}")
 
             # Create the file path name for when the file is finished.
             filepath_done = f"{'/'.join(renamed_file.split('/')[:-1])}/{renamed_file.split('/')[-1][0:-15]}_DONE.{renamed_file.split('/')[-1].split('.')[-1]}"
