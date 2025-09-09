@@ -127,7 +127,7 @@ class ClericalApp(tk.Tk):
 
         # Create the button frame.
         self.button_frame = ttk.Frame(self)
-        self.button_frame.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
+        self.button_frame.grid(row=2, column=0, padx=10, pady=10)
 
         # Create a list of record IDs that have not been matched yet.
         self.not_matched_yet = []
@@ -136,21 +136,21 @@ class ClericalApp(tk.Tk):
         # right).
         self.protocol("WM_DELETE_WINDOW", self.on_exit)
 
-        # If a 'Match' column exists in the clerical file.
-        if {"Match"}.issubset(working_file.columns):
+        # If a 'match' column exists in the clerical file.
+        if {"match"}.issubset(working_file.columns):
             # This variable indicates whether the user has returned to
             # this file (1) or not (0).
             self.matching_previously_began = 1
 
         else:
-            # Create a 'Match' column and fill with blanks.
-            working_file["Match"] = ""
+            # Create a 'match' column and fill with blanks.
+            working_file["match"] = ""
             self.matching_previously_began = 0
 
-        # Convert all columns apart from 'Match' and 'Comments' (if
+        # Convert all columns apart from 'match' and 'comments' (if
         # specified) to string.
         for col_header in working_file.columns:
-            if col_header in ("Match", "Comments"):
+            if col_header in ("match", "comments"):
                 pass
             else:
                 # Convert to string.
@@ -326,13 +326,11 @@ class ClericalApp(tk.Tk):
             )
 
             exec(
-                f'self.{column_title} = ttk.Label(self.record_frame,text="{col_header[0]}",\
-                                                      font=f"Helvetica {self.text_size} bold")'
+                f'self.{column_title} = ttk.Label(self.record_frame, text="{col_header[0]}", font=f"Helvetica {self.text_size} bold")'
             )
 
             exec(
-                f"self.{column_title}.grid(row=1,column=n+1,columnspan=1, sticky = tk.W,\
-                                            padx=10, pady=3)"
+                f'self.{column_title}.grid(row=1, column=n+1, columnspan=1, sticky="w", padx=10, pady=3)'
             )
 
             # Add the executed self.labels for the column headers to the
@@ -378,60 +376,52 @@ class ClericalApp(tk.Tk):
 
                 # Create a text label.
                 exec(
-                    f'self.{col_header[0]}row{v} = tk.Text(self.record_frame,\
-                                                            height=1,relief="flat",bg="gray93")'
+                    f'self.{col_header[0]}row{v} = tk.Text(self.record_frame, height=1, relief="flat", bg="gray93")'
                 )
 
                 # Enter in the text from the DataFrame.
                 exec(
-                    f'self.{col_header[0]}row{v}.insert("1.0",working_file["{col_header[0]}"][{display_i}])'
+                    f'self.{col_header[0]}row{v}.insert("1.0", working_file["{col_header[0]}"][{display_i}])'
                 )
 
                 # Configure Text so that it is a specified width and
                 # font, and cannot be interacted with.
                 exec(
-                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}])+10,\
-                                                         font=f"Helvetica {self.text_size} {self.text_bold}",\
-                                                         state=tk.DISABLED)'
+                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}]) + 10, font=f"Helvetica {self.text_size} {self.text_bold}", state="disabled")'
                 )
 
                 # Grid the text label to the widget.
                 exec(
-                    f'self.{col_header[0]}row{v}.grid(row={row_num}, column={n + 1},columnspan=1,\
-                                                       padx=10, pady=3,sticky="w")'
+                    f'self.{col_header[0]}row{v}.grid(row={row_num}, column={n + 1},columnspan=1, padx=10, pady=3, sticky="w")'
                 )
 
                 # Create a checkbutton and append it to the list of
                 # checkbutton variables.
                 exec(f"self.check_{v}= tk.IntVar()")
                 exec(
-                    f"self.checkbutton{v}=tk.Checkbutton(self.record_frame,\
-                                                          variable=self.check_{v})"
+                    f"self.checkbutton{v}=tk.Checkbutton(self.record_frame, variable=self.check_{v})"
                 )
                 exec(f"self.checkbutton{v}.deselect()")
                 exec(f"self.checkbutton{v}.grid(row={row_num}, column=0)")
 
                 exec(
-                    f"self.rf_separator{v}=ttk.Separator(self.record_frame, orient='horizontal')"
+                    f'self.rf_separator{v}=ttk.Separator(self.record_frame, orient="horizontal")'
                 )
                 exec(
-                    f"self.rf_separator{v}.grid(row={sep_row}, column=0,\
-                                            columnspan={num_match_cols}+1, sticky='ns',\
-                                            ipadx=80*({num_match_cols + 1})*{text_size_multiplier},\
-                                            ipady=1)"
+                    f'self.rf_separator{v}.grid(row={sep_row}, column=0, columnspan={num_match_cols} + 1, sticky="ns", ipadx=80 * ({num_match_cols + 1}) * {text_size_multiplier}, ipady=1)'
                 )
 
                 if col_header[0] not in self.columns_to_compare:
                     self.columns_to_compare.append(col_header[0])
 
-                # If the 'Match' column is not populated yet, keep the
+                # If the 'match' column is not populated yet, keep the
                 # checkbutton clickable.
-                if working_file.loc[display_i, "Match"] == "":
-                    exec(f"self.checkbutton{v}.config(state=tk.NORMAL)")
+                if working_file.loc[display_i, "match"] == "":
+                    exec(f'self.checkbutton{v}.config(state="normal")')
 
                 # Otherwise make it un-clickable.
                 else:
-                    exec(f"self.checkbutton{v}.config(state=tk.DISABLED)")
+                    exec(f'self.checkbutton{v}.config(state="disabled")')
 
                 row_num += 2
                 sep_row += 2
@@ -465,13 +455,13 @@ class ClericalApp(tk.Tk):
 
         # Disable the back button if no previous clusters exist.
         if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
-            self.back_button.config(state=tk.DISABLED)
+            self.back_button.config(state="disabled")
 
         # Add in the comment widget based on the configuration option.
         if int(config["custom_settings"]["comment_box"]):
-            # Create 'Comments' column if one does not exist.
-            if "Comments" not in working_file:
-                working_file["Comments"] = ""
+            # Create 'comments' column if one does not exist.
+            if "comments" not in working_file:
+                working_file["comments"] = ""
 
             # Get the position info from the match button.
             info_button = self.match_button.grid_info()
@@ -510,7 +500,7 @@ class ClericalApp(tk.Tk):
     def get_starting_cluster_id(self):
         """Get the ID of the first unreviewed cluster."""
         for i in working_file.index:
-            if working_file.loc[i, "Match"] == "":
+            if working_file.loc[i, "match"] == "":
                 return working_file.loc[i, "cluster_sequential_number"]
             else:
                 pass
@@ -540,11 +530,11 @@ class ClericalApp(tk.Tk):
 
         # Clear the comment box entry.
         if int(config["custom_settings"]["comment_box"]):
-            self.comment_entry.delete(0, tk.END)
+            self.comment_entry.delete(0, "end")
 
         # Disable the back button if no previous clusters exist.
         if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
-            self.back_button.config(state=tk.DISABLED)
+            self.back_button.config(state="disabled")
         else:
             self.back_button.config(state="normal")
 
@@ -600,16 +590,12 @@ class ClericalApp(tk.Tk):
         # A list containing all record IDs for records marked as matches
         # in current cluster.
         current_cluster_decisions = [
-            working_file.loc[i, "Match"] for i in self.display_indexes
+            working_file.loc[i, "match"] for i in self.display_indexes
         ]
 
         # Counting records as a match if there is a corresponding value
-        # in the 'Match' column.
-        current_num_cluster_decisions = len(
-            [record for record in current_cluster_decisions if record != ""]
-        )
-
-        return current_num_cluster_decisions
+        # in the 'match' column.
+        return len([record for record in current_cluster_decisions if record != ""])
 
     def update_df(self, event: int) -> None:
         """Write the review decision to the DataFrame.
@@ -636,16 +622,16 @@ class ClericalApp(tk.Tk):
 
                     break
 
-                # Otherwise if the 'Match' column is currently empty.
-                if working_file.loc[i, "Match"] == "":
+                # Otherwise if the 'match' column is currently empty.
+                if working_file.loc[i, "match"] == "":
                     # If a record is selected by a checkbutton.
                     if (
                         working_file[config["record_id_col"]["record_id"]][i]
                         in self.match_string
                     ):
                         # Append the currently selected records' record
-                        # ID to the 'Match' column.
-                        working_file.loc[i, "Match"] = self.match_string
+                        # ID to the 'match' column.
+                        working_file.loc[i, "match"] = self.match_string
 
                         # Remove matched records in cluster from list of
                         # those not yet matched.
@@ -662,7 +648,7 @@ class ClericalApp(tk.Tk):
                         if int(config["custom_settings"]["comment_box"]):
                             # For each row where a checkbox selected,
                             # append the comment_box contents.
-                            working_file.loc[i, "Comments"] = self.comment_entry.get()
+                            working_file.loc[i, "comments"] = self.comment_entry.get()
 
                     # Append those not selected by a checkbutton to a
                     # list of those not yet matched.
@@ -676,20 +662,20 @@ class ClericalApp(tk.Tk):
             if (len(self.display_indexes) - self.current_num_cluster_decisions()) <= 1:
                 # For this remaining record, mark it as a non-match.
                 for i in self.not_matched_yet:
-                    working_file.loc[i, "Match"] = "No match in cluster"
+                    working_file.loc[i, "match"] = "No match in cluster"
 
         # If the non-match button clicked.
         else:
             # Mark each record in the cluster that has a null match
             # decision as a non-match.
             for i in self.display_indexes:
-                if working_file.loc[i, "Match"] == "":
-                    working_file.loc[i, "Match"] = "No match in cluster"
+                if working_file.loc[i, "match"] == "":
+                    working_file.loc[i, "match"] = "No match in cluster"
 
                     # If the comment_box is specified in the
                     # configuration file.
                     if int(config["custom_settings"]["comment_box"]):
-                        working_file.loc[i, "Comments"] = self.comment_entry.get()
+                        working_file.loc[i, "comments"] = self.comment_entry.get()
 
     def go_back(self) -> None:
         """Go back to the previous cluster."""
@@ -706,8 +692,8 @@ class ClericalApp(tk.Tk):
 
         # Reset new (previous record) to empty strings.
         for i in self.display_indexes:
-            working_file.loc[i, "Match"] = ""
-            working_file.loc[i, "Comments"] = ""
+            working_file.loc[i, "match"] = ""
+            working_file.loc[i, "comments"] = ""
 
         # Clean the match string.
         self.match_string = ""
@@ -744,17 +730,16 @@ class ClericalApp(tk.Tk):
         # records.
         if self.cluster_index > (self.num_clusters - 1):
             # Disable the 'match' and 'non-match' buttons.
-            self.match_button.configure(state=tk.DISABLED)
-            self.non_match_button.configure(state=tk.DISABLED)
+            self.match_button.configure(state="disabled")
+            self.non_match_button.configure(state="disabled")
             # Inform the user that matching is finished.
             self.match_done = ttk.Label(
                 self, text="Matching Finished. Press save and close.", foreground="red"
             )
-            self.match_done.grid(row=1, column=0, columnspan=1)
+            self.match_done.grid(row=1, column=0)
 
             return 1
-        else:
-            return 0
+        return 0
 
     def save_and_close(self) -> None:
         """Save the working_file DataFrame and close the GUI."""
@@ -886,15 +871,11 @@ class ClericalApp(tk.Tk):
                             self.tags_container[col] = [f"{col}_diff{str(tag_adder)}"]
 
                         exec(
-                            f'self.{col}row{n + 1}.tag_add(f"{col}_diff{str(tag_adder)}",\
-                                                          f"1.{char_consistent[tag_adder][0]}",\
-                                                          f"1.{char_consistent[tag_adder][-1]}")'
+                            f'self.{col}row{n + 1}.tag_add(f"{col}_diff{str(tag_adder)}", f"1.{char_consistent[tag_adder][0]}", f"1.{char_consistent[tag_adder][-1]}")'
                         )
 
                         exec(
-                            f'self.{col}row{n + 1}.tag_config(f"{col}_diff{str(tag_adder)}",\
-                                                             background="yellow",\
-                                                             foreground = "black")'
+                            f'self.{col}row{n + 1}.tag_config(f"{col}_diff{str(tag_adder)}", background="yellow", foreground="black")'
                         )
 
         else:
@@ -907,7 +888,7 @@ class ClericalApp(tk.Tk):
                 # For columns in self.columns_to_compare.
                 for col, value in self.tags_container.items():
                     for item in value:
-                        exec(f"self.{col}row{n + 1}.tag_remove('{item}','1.0','end')")
+                        exec(f'self.{col}row{n + 1}.tag_remove("{item}", "1.0", "end")')
 
             self.show_hide_diff = 0
 
@@ -1074,9 +1055,9 @@ if __name__ == "__main__":
     try:
         working_file = pd.read_csv(renamed_file)
 
-    except FileNotFoundError or NameError:
+    except (FileNotFoundError, NameError):
         sys.exit(
-            "\n\nThis clerical sample is open in another program. Please close this and restart CROW."
+            "\nThis clerical sample is open in another program. Please close this and restart CROW."
         )
 
     # Data validation step.
@@ -1091,7 +1072,8 @@ if __name__ == "__main__":
     ].tolist()
 
     if len(working_file) != len(working_file[record_id].unique()):
-        raise ValueError(f"the record ID(s): {duplicates} is not unique!")
+        error_message = f"the record ID(s): {duplicates} is not unique!"
+        raise ValueError(error_message)
 
     del (record_id, duplicates)
 
@@ -1099,15 +1081,3 @@ if __name__ == "__main__":
 
     app = ClericalApp(working_file, filepath_done, renamed_file, config)
     app.mainloop()
-
-    print(
-        "\n Number of records matched:",
-        str(
-            len(
-                working_file[
-                    (working_file.Match != "No match in cluster")
-                    & (working_file.Match != "")
-                ]
-            )
-        ),
-    )
