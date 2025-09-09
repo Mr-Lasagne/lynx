@@ -5,7 +5,7 @@ import getpass
 import os
 import sys
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, messagebox, ttk
 from typing import Literal
 
 import numpy as np
@@ -380,7 +380,7 @@ class ClericalApp(tk.Tk):
 
         # Except when matching is completed.
         except TypeError:
-            tk.messagebox.showinfo(
+            messagebox.showinfo(
                 title="Matching completed",
                 message="Please select a different file to clerically match",
             )
@@ -630,7 +630,7 @@ class ClericalApp(tk.Tk):
                 # If 1 or 0 records are selected, present user with a
                 # warning.
                 if len(checkboxes_selected) <= 2:
-                    tk.messagebox.showwarning(
+                    messagebox.showwarning(
                         message="Two or more records must be selected to make a match"
                     )
 
@@ -774,7 +774,7 @@ class ClericalApp(tk.Tk):
             # Close down the app.
             self.destroy()
         except PermissionError:
-            tk.messagebox.showwarning(
+            messagebox.showwarning(
                 message="This clerical sample is already open in another program. Please close that program."
             )
 
@@ -990,9 +990,7 @@ class ClericalApp(tk.Tk):
     def on_exit(self) -> None:
         """Prompt the user to save and exit."""
         # If they click yes.
-        if tk.messagebox.askyesno(
-            "Exit", "Are you sure you want to exit WITHOUT saving?"
-        ):
+        if messagebox.askyesno("Exit", "Are you sure you want to exit WITHOUT saving?"):
             # Check if this is the first time they are accessing it.
             if not self.matching_previously_began & self.checkpoint_counter == 0:
                 # Then rename the file removing their username and
@@ -1069,7 +1067,7 @@ if __name__ == "__main__":
             filepath_done = f"{'/'.join(renamed_file.split('/')[:-1])}/{renamed_file.split('/')[-1][0:-15]}_DONE.{renamed_file.split('/')[-1].split('.')[-1]}"
 
     except PermissionError:
-        tk.messagebox.showwarning(
+        messagebox.showwarning(
             message="This clerical sample is open in another program. Please close this and restart CROW."
         )
 
