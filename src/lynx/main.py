@@ -68,7 +68,7 @@ class ClericalApp(tk.Tk):
         self.filename_old = filename_old
 
         # Set the window title.
-        self.title("Clerical Matching")
+        self.title("lynx")
 
         # Set the window size to 90% of screen width and 50% of screen
         # height.
