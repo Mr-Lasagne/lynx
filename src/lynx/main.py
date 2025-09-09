@@ -12,6 +12,53 @@ import numpy as np
 import pandas as pd
 
 
+class ToolFrame(ttk.Labelframe):
+    """The frame for the tool buttons."""
+
+    def __init__(self, parent: tk.Tk) -> None:
+        """Initialise the tool frame."""
+        super().__init__(parent, text="Tools")
+
+        # Configure the grid layout.
+        self.grid_columnconfigure(6, weight=1)
+
+        # Vertical separators to group similar buttons. The use of Frame
+        # over Separator allows for greater styling control.
+        for col in (1, 5, 7, 9):
+            ttk.Frame(self, style="vert_sep.TFrame").grid(
+                column=col, row=0, pady=5, sticky="ns"
+            )
+
+        # Show/hide differences between records button.
+        self.show_hide_diff_btn = ttk.Button(self, cursor="hand2", width=14)
+        self.show_hide_diff_btn.grid(column=0, row=0, padx=5, pady=5)
+
+        # Bold font toggle button.
+        self.bold_font_btn = ttk.Button(
+            self, cursor="hand2", style="bold.TButton", text="B", width=3
+        )
+        self.bold_font_btn.grid(column=2, row=0, padx=(5, 0), pady=5)
+
+        # Increase font size button.
+        self.increase_font_btn = ttk.Button(self, cursor="hand2", text="A+", width=3)
+        self.increase_font_btn.grid(column=3, row=0, padx=(1, 1), pady=5)
+
+        # Decrease font size button.
+        self.decrease_font_btn = ttk.Button(self, cursor="hand2", text="A-", width=3)
+        self.decrease_font_btn.grid(column=4, row=0, padx=(0, 5), pady=5)
+
+        # A middle spacer to push some buttons to the right.
+        ttk.Frame(self).grid(column=6, row=0, sticky="ew")
+
+        # Open CSV file button.
+        self.open_btn = ttk.Button(self, cursor="hand2", text="Open")
+        self.open_btn.grid(column=8, row=0, padx=5, pady=5)
+
+        # Save CSV file button.
+        self.save_btn = ttk.Button(self, cursor="hand2", text="Save")
+        self.save_btn.grid(column=10, row=0, padx=5, pady=5)
+
+
 class IntroWindow(tk.Tk):
     """A window that prompts the user to choose a CSV file."""
 
@@ -75,15 +122,13 @@ class Lynx(tk.Tk):
         width = int(self.winfo_screenwidth() * 0.9)
         height = int(self.winfo_screenheight() * 0.5)
         self.geometry(f"{width}x{height}")
+        self.minsize(width=588, height=260)
 
         # Configure the grid layout to make sure the record frame can
         # expand to fill the window.
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
-
-        # Create the tool frame.
-        self.tool_frame = ttk.LabelFrame(self, text="Tools:")
-        self.tool_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
 
         # Create a container to hold the scrollable canvas that will
         # contain the record frame.
@@ -195,13 +240,12 @@ class Lynx(tk.Tk):
         # Create an empty string to record results.
         self.match_string = ""
 
-        # Create the font size component.
+        # Create the font variables.
         self.font_size = 10
-        self.text_bold_boolean = 0
-        self.text_bold = ""
+        self.font_weight = "normal"
 
         self.style = ttk.Style()
-        self.style.configure(".", font=("Helvetica", f"{self.font_size}"))
+        self.style.configure(".", font=("Helvetica", self.font_size))
 
         # A Boolean flag for the show/hide differences button.
         self.show_hide_diff = 0
@@ -220,94 +264,13 @@ class Lynx(tk.Tk):
         self.non_iterated_labels = []
         self.iterated_labels = []
 
+        self.tool_frame = ToolFrame(self)
+        self.tool_frame.grid(column=0, row=0, padx=10, pady=10, sticky="ew")
+
         self.draw_record_frame(config, working_file)
         self.draw_button_frame()
-        self.draw_tool_frame()
 
-    def draw_tool_frame(self) -> None:
-        """Create the tool widgets and populate the tool frame."""
-        # Configure the grid so the record counter can move to the right
-        # of the tool frame.
-        self.tool_frame.grid_columnconfigure(9, weight=1)
-
-        # Create separators for the tool frame buttons.
-        self.separator_tf_1 = ttk.Separator(self.tool_frame, orient="vertical")
-        self.separator_tf_1.grid(
-            row=0, column=3, rowspan=1, sticky="ns", padx=10, pady=5
-        )
-        self.separator_tf_2 = ttk.Separator(self.tool_frame, orient="vertical")
-        self.separator_tf_2.grid(
-            row=0, column=7, rowspan=1, sticky="ns", padx=10, pady=5
-        )
-
-        self.highlighter_button = tk.Checkbutton(
-            self.tool_frame,
-            indicatoron=False,
-            selectcolor="white",
-            text="show/hide differences",
-            font=f"Helvetica {self.font_size}",
-            command=lambda: self.show_hide_differences(self.show_hide_diff),
-        )
-        self.highlighter_button.grid(row=0, column=2, padx=5, pady=5)
-
-        self.text_smaller_button = tk.Button(
-            self.tool_frame,
-            font=f"Helvetica {self.font_size}",
-            text="A-",
-            height=1,
-            width=3,
-            command=lambda: self.change_font_size(-1),
-        )
-        self.text_smaller_button.grid(row=0, column=4, sticky="e", pady=5)
-
-        self.text_bigger_button = tk.Button(
-            self.tool_frame,
-            font=f"Helvetica {self.font_size}",
-            text="A+",
-            height=1,
-            width=3,
-            command=lambda: self.change_font_size(1),
-        )
-        self.text_bigger_button.grid(row=0, column=5, sticky="w", pady=5, padx=2)
-
-        self.bold_button = tk.Button(
-            self.tool_frame,
-            text="B",
-            font=f"Helvetica {self.font_size} bold",
-            height=1,
-            width=3,
-            command=lambda: self.make_text_bold(config, working_file),
-        )
-        self.bold_button.grid(row=0, column=6, sticky="w", pady=5)
-
-        self.save_button = tk.Button(
-            self.tool_frame,
-            text="Save and Close",
-            font=f"Helvetica {self.font_size}",
-            command=lambda: self.save_and_close(),
-        )
-        self.save_button.grid(row=0, column=8, sticky="e", padx=5, pady=5)
-
-        # Current cluster counter.
-        count_msg = f"Cluster: {self.cluster_index + 1} / {self.num_clusters}"
-
-        # Try to calculate and display remaining number of clusters for
-        # review.
-        try:
-            self.counter_matches = ttk.Label(
-                self.tool_frame, text=count_msg, font=f"Helvetica {self.font_size}"
-            )
-            self.counter_matches.grid(row=0, column=9, padx=10, sticky="e")
-
-        # Except when matching is completed.
-        except TypeError:
-            messagebox.showinfo(
-                title="Matching completed",
-                message="Please select a different file to clerically match",
-            )
-
-            # Close down the application.
-            self.destroy()
+        self.apply_button_commands()
 
     def draw_record_frame(
         self, config: configparser.ConfigParser, working_file: pd.DataFrame
@@ -387,7 +350,7 @@ class Lynx(tk.Tk):
                 # Configure Text so that it is a specified width and
                 # font, and cannot be interacted with.
                 exec(
-                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}]) + 10, font=f"Helvetica {self.font_size} {self.text_bold}", state="disabled")'
+                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}]) + 10, font=f"Helvetica {self.font_size} {self.font_weight}", state="disabled")'
                 )
 
                 # Grid the text label to the widget.
@@ -490,6 +453,15 @@ class Lynx(tk.Tk):
                     config["custom_settings"]["comment_values"]
                 ).split(",")
 
+    def apply_button_commands(self) -> None:
+        """Apply commands to the buttons."""
+        # The tool frame button commands.
+        self.tool_frame.show_hide_diff_btn.configure(
+            command=lambda: self.toggle_show_hide_diff(self.show_hide_diff),
+            text="Hide differences" if self.show_hide_diff else "Show differences",
+        )
+        self.tool_frame.bold_font_btn.configure(command=self.toggle_bold_font)
+
     def _on_record_frame_configure(self, event: tk.Event) -> None:
         """Ensure the scroll region is as tall as the canvas."""
         x1, y1, x2, y2 = self.canvas.bbox("all")
@@ -517,16 +489,12 @@ class Lynx(tk.Tk):
         for widget in self.record_frame.winfo_children():
             widget.destroy()
 
-        for widget in self.tool_frame.winfo_children():
-            widget.destroy()
-
         for widget in self.button_frame.winfo_children():
             widget.destroy()
 
         # Redraw everything in the frames.
         self.draw_record_frame(config, working_file)
         self.draw_button_frame()
-        self.draw_tool_frame()
 
         # Clear the comment box entry.
         if int(config["custom_settings"]["comment_box"]):
@@ -542,21 +510,7 @@ class Lynx(tk.Tk):
         self.comparison_values = {}
 
         if self.show_hide_diff == 1:
-            self.show_hide_differences(0)
-
-    def make_text_bold(
-        self, config: configparser.ConfigParser, working_file: pd.DataFrame
-    ) -> None:
-        """Toggle bold font."""
-        if not self.text_bold_boolean:
-            self.text_bold_boolean = 1
-            self.text_bold = "bold"
-
-        else:
-            self.text_bold_boolean = 0
-            self.text_bold = ""
-
-        self.update_gui(config, working_file)
+            self.toggle_show_hide_diff(0)
 
     def get_matches(self) -> None:
         """Generate a string based on the matches in a cluster."""
@@ -677,97 +631,7 @@ class Lynx(tk.Tk):
                     if int(config["custom_settings"]["comment_box"]):
                         working_file.loc[i, "comments"] = self.comment_entry.get()
 
-    def go_back(self) -> None:
-        """Go back to the previous cluster."""
-        # Get the number of decisions made in the current cluster.
-        num_decisions = self.current_num_cluster_decisions()
-
-        # Update `cluster_index` if there are no decisions in current
-        # cluster.
-        if num_decisions == 0:
-            self.cluster_index -= 1
-            self.display_indexes = working_file.index[
-                working_file["cluster_sequential_number"] == self.cluster_index
-            ].to_list()
-
-        # Reset new (previous record) to empty strings.
-        for i in self.display_indexes:
-            working_file.loc[i, "match"] = ""
-            working_file.loc[i, "comments"] = ""
-
-        # Clean the match string.
-        self.match_string = ""
-
-        # Clear the list of not matched yet.
-        self.not_matched_yet.clear()
-
-        # Update the GUI.
-        self.update_gui(config, working_file)
-
-        # Set the match and non-match buttons to normal state.
-        self.match_button.config(state="normal")
-        self.non_match_button.config(state="normal")
-
-        # Handling when the user presses the back button on the first
-        # cluster in the data.
-        try:
-            self.match_done.destroy()
-        except AttributeError:
-            pass
-
-    def check_matching_done(self) -> Literal[1, 0]:
-        """Check if the review is complete.
-
-        Check if the number of iterations is greater than the number of
-        rows and, if so, break the loop.
-
-        Returns
-        -------
-        Literal[1, 0]
-            If 1, stop the GUI - if 0, continue updating the GUI.
-        """
-        # Query whether the current record matches the total number of
-        # records.
-        if self.cluster_index > (self.num_clusters - 1):
-            # Disable the 'match' and 'non-match' buttons.
-            self.match_button.configure(state="disabled")
-            self.non_match_button.configure(state="disabled")
-            # Inform the user that matching is finished.
-            self.match_done = ttk.Label(
-                self, text="Matching Finished. Press save and close.", foreground="red"
-            )
-            self.match_done.grid(row=1, column=0)
-
-            return 1
-        return 0
-
-    def save_and_close(self) -> None:
-        """Save the working_file DataFrame and close the GUI."""
-        try:
-            # Check whether matching has now finished (i.e. they have
-            # completed all records).
-            if self.cluster_index == (self.num_clusters):
-                # If matching is now complete, rename the file.
-                os.rename(self.filename_old, self.filename_done)
-                working_file.to_csv(self.filename_done, index=False)
-
-            else:
-                # If not it yet finished, save it using the old file
-                # name.
-                working_file.to_csv(self.filename_old, index=False)
-
-            # Close down the app.
-            self.destroy()
-        except PermissionError:
-            messagebox.showwarning(
-                message="This clerical sample is already open in another program. Please close that program."
-            )
-
-            print(
-                "\nThis clerical sample is already open in another program. Please close that program."
-            )
-
-    def show_hide_differences(self, toggle: int) -> None:
+    def toggle_show_hide_diff(self, toggle: int) -> None:
         """Toggle the highlighting of differences between records.
 
         Parameters
@@ -776,6 +640,11 @@ class Lynx(tk.Tk):
             A variable to indicate if the show/hide differences is
             already on.
         """
+        if self.show_hide_diff:
+            self.tool_frame.show_hide_diff_btn.configure(text="Show differences")
+        else:
+            self.tool_frame.show_hide_diff_btn.configure(text="Hide differences")
+
         if toggle == 0:
             # Make `show_hide_diff` 1 so that next time this function is
             # called it will remove tags.
@@ -892,6 +761,112 @@ class Lynx(tk.Tk):
 
             self.show_hide_diff = 0
 
+    def toggle_bold_font(self) -> None:
+        """Toggle bold font."""
+        if self.font_weight == "normal":
+            self.font_weight = "bold"
+        else:
+            self.font_weight = "normal"
+
+        self.update_gui(config, working_file)
+
+    def change_font_size(self, amount: int) -> None:
+        """Change the font size by a given amount."""
+        self.font_size += amount
+        self.update_gui(config, working_file)
+
+    def go_back(self) -> None:
+        """Go back to the previous cluster."""
+        # Get the number of decisions made in the current cluster.
+        num_decisions = self.current_num_cluster_decisions()
+
+        # Update `cluster_index` if there are no decisions in current
+        # cluster.
+        if num_decisions == 0:
+            self.cluster_index -= 1
+            self.display_indexes = working_file.index[
+                working_file["cluster_sequential_number"] == self.cluster_index
+            ].to_list()
+
+        # Reset new (previous record) to empty strings.
+        for i in self.display_indexes:
+            working_file.loc[i, "match"] = ""
+            working_file.loc[i, "comments"] = ""
+
+        # Clean the match string.
+        self.match_string = ""
+
+        # Clear the list of not matched yet.
+        self.not_matched_yet.clear()
+
+        # Update the GUI.
+        self.update_gui(config, working_file)
+
+        # Set the match and non-match buttons to normal state.
+        self.match_button.config(state="normal")
+        self.non_match_button.config(state="normal")
+
+        # Handling when the user presses the back button on the first
+        # cluster in the data.
+        try:
+            self.match_done.destroy()
+        except AttributeError:
+            pass
+
+    def check_matching_done(self) -> Literal[1, 0]:
+        """Check if the review is complete.
+
+        Check if the number of iterations is greater than the number of
+        rows and, if so, break the loop.
+
+        Returns
+        -------
+        Literal[1, 0]
+            If 1, stop the GUI - if 0, continue updating the GUI.
+        """
+        # Query whether the current record matches the total number of
+        # records.
+        if self.cluster_index > (self.num_clusters - 1):
+            # Disable the 'match' and 'non-match' buttons.
+            self.match_button.configure(state="disabled")
+            self.non_match_button.configure(state="disabled")
+            # Inform the user that matching is finished.
+            self.match_done = ttk.Label(
+                self, text="Matching Finished. Press save and close.", foreground="red"
+            )
+            self.match_done.grid(row=1, column=0)
+
+            return 1
+        return 0
+
+    def save_and_close(self) -> None:
+        """Save the working_file DataFrame and close the GUI."""
+        try:
+            # Check whether matching has now finished (i.e. they have
+            # completed all records).
+            if self.cluster_index == (self.num_clusters):
+                # If matching is now complete, rename the file.
+                os.rename(self.filename_old, self.filename_done)
+                working_file.to_csv(self.filename_done, index=False)
+            else:
+                # If not it yet finished, save it using the old file
+                # name.
+                working_file.to_csv(self.filename_old, index=False)
+
+            # Close down the app.
+            self.destroy()
+        except PermissionError:
+            warning_message = (
+                "This clerical sample is already open in another program. Please close "
+                "that program."
+            )
+            messagebox.showwarning(message=warning_message)
+
+            print(
+                "This clerical sample is already open in another program. Please close "
+                "that program."
+            )
+
     def update_index(self, event: int) -> None:
         """Update the working file index.
 
@@ -949,11 +924,6 @@ class Lynx(tk.Tk):
             else:
                 # Update the GUI.
                 self.update_gui(config, working_file)
-
-    def change_font_size(self, amount: int) -> None:
-        """Change the font size by a given amount."""
-        self.font_size += amount
-        self.update_gui(config, working_file)
 
     def on_exit(self) -> None:
         """Prompt the user to save and exit."""
