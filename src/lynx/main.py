@@ -224,85 +224,6 @@ class ClericalApp(tk.Tk):
         self.draw_button_frame()
         self.draw_tool_frame()
 
-    def _on_record_frame_configure(self, event: tk.Event) -> None:
-        """Ensure the scroll region is as tall as the canvas."""
-        x1, y1, x2, y2 = self.canvas.bbox("all")
-        canvas_height = self.canvas.winfo_height()
-        bottom = max(y2, canvas_height)
-        self.canvas.configure(scrollregion=(x1, y1, x2, bottom))
-
-    def get_starting_cluster_id(self):
-        """Get the ID of the first unreviewed cluster."""
-        for i in working_file.index:
-            if working_file.loc[i, "Match"] == "":
-                return working_file.loc[i, "cluster_sequential_number"]
-            else:
-                pass
-
-    def draw_button_frame(self) -> None:
-        """Create the widgets that go in the button frame."""
-        self.match_button = tk.Button(
-            self.button_frame,
-            text="Match",
-            font=f"Helvetica {self.text_size}",
-            command=lambda: self.update_index(1),
-            bg="DarkSeaGreen1",
-        )
-        self.match_button.grid(row=0, column=0, columnspan=1, padx=15, pady=10)
-        self.non_match_button = tk.Button(
-            self.button_frame,
-            text="No more matches",
-            font=f"Helvetica {self.text_size}",
-            command=lambda: self.update_index(0),
-            bg="light salmon",
-        )
-        self.non_match_button.grid(row=0, column=1, columnspan=1, padx=15, pady=10)
-
-        self.back_button = tk.Button(
-            self.button_frame,
-            text="Back",
-            font=f"Helvetica {self.text_size}",
-            command=lambda: self.go_back(),
-        )
-        self.back_button.grid(row=0, column=2, columnspan=1, padx=15, pady=10)
-
-        # Disable the back button if no previous clusters exist.
-        if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
-            self.back_button.config(state=tk.DISABLED)
-
-        # Add in the comment widget based on the configuration option.
-        if int(config["custom_settings"]["comment_box"]):
-            # Create 'Comments' column if one does not exist.
-            if "Comments" not in working_file:
-                working_file["Comments"] = ""
-
-            # Get the position info from the match button.
-            info_button = self.match_button.grid_info()
-
-            self.comment_label = ttk.Label(
-                self.button_frame,
-                text="Comment:",
-                font=f"Helvetica {self.text_size} bold",
-            )
-            self.comment_label.grid(
-                row=info_button["row"] + 1, column=0, columnspan=1, sticky="e"
-            )
-
-            self.comment_entry = ttk.Combobox(self.button_frame)
-            self.comment_entry.grid(
-                row=info_button["row"] + 1,
-                column=1,
-                columnspan=3,
-                sticky="sew",
-                padx=5,
-                pady=5,
-            )
-
-            if (config["custom_settings"]["comment_values"]) is not None:
-                self.comment_entry["values"] = (
-                    config["custom_settings"]["comment_values"]
-                ).split(",")
-
     def draw_tool_frame(self) -> None:
         """Create the tool widgets and populate the tool frame."""
         # Configure the grid so the record counter can move to the right
@@ -514,6 +435,85 @@ class ClericalApp(tk.Tk):
 
                 row_num += 2
                 sep_row += 2
+
+    def draw_button_frame(self) -> None:
+        """Create the widgets that go in the button frame."""
+        self.match_button = tk.Button(
+            self.button_frame,
+            text="Match",
+            font=f"Helvetica {self.text_size}",
+            command=lambda: self.update_index(1),
+            bg="DarkSeaGreen1",
+        )
+        self.match_button.grid(row=0, column=0, columnspan=1, padx=15, pady=10)
+        self.non_match_button = tk.Button(
+            self.button_frame,
+            text="No more matches",
+            font=f"Helvetica {self.text_size}",
+            command=lambda: self.update_index(0),
+            bg="light salmon",
+        )
+        self.non_match_button.grid(row=0, column=1, columnspan=1, padx=15, pady=10)
+
+        self.back_button = tk.Button(
+            self.button_frame,
+            text="Back",
+            font=f"Helvetica {self.text_size}",
+            command=lambda: self.go_back(),
+        )
+        self.back_button.grid(row=0, column=2, columnspan=1, padx=15, pady=10)
+
+        # Disable the back button if no previous clusters exist.
+        if self.cluster_index == 0 and self.current_num_cluster_decisions() == 0:
+            self.back_button.config(state=tk.DISABLED)
+
+        # Add in the comment widget based on the configuration option.
+        if int(config["custom_settings"]["comment_box"]):
+            # Create 'Comments' column if one does not exist.
+            if "Comments" not in working_file:
+                working_file["Comments"] = ""
+
+            # Get the position info from the match button.
+            info_button = self.match_button.grid_info()
+
+            self.comment_label = ttk.Label(
+                self.button_frame,
+                text="Comment:",
+                font=f"Helvetica {self.text_size} bold",
+            )
+            self.comment_label.grid(
+                row=info_button["row"] + 1, column=0, columnspan=1, sticky="e"
+            )
+
+            self.comment_entry = ttk.Combobox(self.button_frame)
+            self.comment_entry.grid(
+                row=info_button["row"] + 1,
+                column=1,
+                columnspan=3,
+                sticky="sew",
+                padx=5,
+                pady=5,
+            )
+
+            if (config["custom_settings"]["comment_values"]) is not None:
+                self.comment_entry["values"] = (
+                    config["custom_settings"]["comment_values"]
+                ).split(",")
+
+    def _on_record_frame_configure(self, event: tk.Event) -> None:
+        """Ensure the scroll region is as tall as the canvas."""
+        x1, y1, x2, y2 = self.canvas.bbox("all")
+        canvas_height = self.canvas.winfo_height()
+        bottom = max(y2, canvas_height)
+        self.canvas.configure(scrollregion=(x1, y1, x2, bottom))
+
+    def get_starting_cluster_id(self):
+        """Get the ID of the first unreviewed cluster."""
+        for i in working_file.index:
+            if working_file.loc[i, "Match"] == "":
+                return working_file.loc[i, "cluster_sequential_number"]
+            else:
+                pass
 
     def update_gui(
         self, config: configparser.ConfigParser, working_file: pd.DataFrame
