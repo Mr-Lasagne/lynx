@@ -50,7 +50,7 @@ class IntroWindow(tk.Tk):
         self.destroy()
 
 
-class ClericalApp(tk.Tk):
+class Lynx(tk.Tk):
     """A window that allows users to clerically review records."""
 
     def __init__(
@@ -1079,5 +1079,5 @@ if __name__ == "__main__":
 
     working_file = working_file.drop(columns="duplicated_record")
 
-    app = ClericalApp(working_file, filepath_done, renamed_file, config)
+    app = Lynx(working_file, filepath_done, renamed_file, config)
     app.mainloop()
