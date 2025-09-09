@@ -420,8 +420,8 @@ class ClericalApp(tk.Tk):
             num_match_cols += 1
 
         # Iterate over column info and order.
-        for n, columnfile_title in enumerate(
-            config.options("columnfile_info_and_order")
+        for n, column_file_title in enumerate(
+            config.options("column_file_info_and_order")
         ):
             row_num = 3
             sep_row = 4
@@ -450,7 +450,7 @@ class ClericalApp(tk.Tk):
 
             for v, display_i in enumerate(self.display_indexes):
                 col_header = (
-                    config["columnfile_info_and_order"][columnfile_title]
+                    config["column_file_info_and_order"][column_file_title]
                     .replace(" ", "")
                     .split(",")
                 )
@@ -725,7 +725,7 @@ class ClericalApp(tk.Tk):
         # Handling when the user presses the back button on the first
         # cluster in the data.
         try:
-            self.matchdone.destroy()
+            self.match_done.destroy()
         except AttributeError:
             pass
 
@@ -747,10 +747,10 @@ class ClericalApp(tk.Tk):
             self.match_button.configure(state=tk.DISABLED)
             self.non_match_button.configure(state=tk.DISABLED)
             # Inform the user that matching is finished.
-            self.matchdone = ttk.Label(
+            self.match_done = ttk.Label(
                 self, text="Matching Finished. Press save and close.", foreground="red"
             )
-            self.matchdone.grid(row=1, column=0, columnspan=1)
+            self.match_done.grid(row=1, column=0, columnspan=1)
 
             return 1
         else:
@@ -792,52 +792,56 @@ class ClericalApp(tk.Tk):
             already on.
         """
         if toggle == 0:
-            # make show show diff variable 1 so that next time this function is
-            # called it will remove tags
+            # Make `show_hide_diff` 1 so that next time this function is
+            # called it will remove tags.
             self.show_hide_diff = 1
 
-            # For the first row in the cluster: for each column to compare;
-            # add col and value to self.comparisso_values
+            # For the first row in the cluster: for each column to
+            # compare; add col and value to self.comparison_values.
             for col in self.columns_to_compare:
                 self.comparison_values[col] = working_file.loc[
                     self.display_indexes[0], col
                 ]
 
-                # create a dictionary for the current comparison
+                # Create a dictionary for the current comparison.
                 current_comparison = {}
 
-                # for each comparison row
+                # For each comparison row.
                 for n, current_comparison_row in enumerate(self.display_indexes[1:]):
-                    # create column:value pair
+                    # Create column:value pair.
                     current_comparison[col] = working_file.loc[
                         current_comparison_row, col
                     ]
-                    # For the values in datarows that need to be highlighted
 
-                    # some empty variables to control the flow of the difference indicator
-                    # a list of list to hold start and end of difference value:
+                    # Some empty variables to control the flow of the
+                    # difference indicator a list of list to hold start
+                    # and end of difference value.
                     char_consistent = []
 
-                    # a list of the start and end value of differences for the current iteration:
+                    # A list of the start and end value of differences
+                    # for the current iteration.
                     container = []
                     string_start = 1
                     string_end = 0
                     count = 0
 
-                    # zip comparison values and current comparison and compare each zipped item
+                    # Zip comparison values and current comparison and
+                    # compare each zipped item.
                     for char_comparison, char_highlight in zip(
                         self.comparison_values[col], current_comparison[col]
                     ):
-                        # if the comparison char is not the same as the highlighter char
+                        # If the comparison char is not the same as the
+                        # highlighter char.
                         if char_comparison != char_highlight:
-                            # if this is the first diff append count to container
+                            # If this is the first diff append count to
+                            # container.
                             if string_start:
-                                # start the container values
+                                # Start the container values.
                                 container.append(count)
 
                                 string_start = 0
 
-                            # if we are at the end of string comparison
+                            # If we are at the end of string comparison.
                             if (
                                 count
                                 == min(
@@ -847,26 +851,29 @@ class ClericalApp(tk.Tk):
                                 - 1
                             ):
                                 container.append(count + 1)
-                                # pass this start and end values to the overall container
+                                # Pass this start and end value to the
+                                # overall container.
                                 char_consistent.append(container)
 
                         elif char_comparison == char_highlight:
                             if string_end == string_start:
-                                # add it to the container to complete the char number
-                                # differences
+                                # Add it to the container to complete
+                                # the char number differences.
                                 container.append(count)
 
-                                # restart this variable
+                                # Restart this variable.
                                 string_start = 1
 
-                                # pass this start and end values to the overall container
+                                # Pass this start and end values to the
+                                # overall container.
                                 char_consistent.append(container)
 
                                 container = []
-                        # increase the count
+                        # Increase the count.
                         count += 1
 
-                    # for each tag # in char consistent create the tag and save the tag name
+                    # For each tag # in char consistent create the tag
+                    # and save the tag name.
                     for tag_adder in range(len(char_consistent)):
                         if col in self.tags_container:
                             temp_val = f"{col}_diff{str(tag_adder)}"
@@ -891,12 +898,13 @@ class ClericalApp(tk.Tk):
                         )
 
         else:
-            # reset this variable
+            # Reset this variable.
             self.show_hide_diff = 1
 
-            # for all variable labels with differences - remove the tag labels
+            # For all variable labels with differences - remove the tag
+            # labels.
             for n in range(0, len(self.display_indexes) - 1):
-                # for columns in self.columns_to_compare:
+                # For columns in self.columns_to_compare.
                 for col, value in self.tags_container.items():
                     for item in value:
                         exec(f"self.{col}row{n + 1}.tag_remove('{item}','1.0','end')")
@@ -988,7 +996,7 @@ class ClericalApp(tk.Tk):
             # Check if this is the first time they are accessing it.
             if not self.matching_previously_began & self.checkpoint_counter == 0:
                 # Then rename the file removing their username and
-                # 'inProgress' tag
+                # 'inProgress' tag.
                 os.rename(
                     self.filename_old,
                     "_".join(self.filename_old.split("_")[0:-2]) + ".csv",
