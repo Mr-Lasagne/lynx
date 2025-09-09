@@ -196,12 +196,12 @@ class Lynx(tk.Tk):
         self.match_string = ""
 
         # Create the font size component.
-        self.text_size = 10
+        self.font_size = 10
         self.text_bold_boolean = 0
         self.text_bold = ""
 
         self.style = ttk.Style()
-        self.style.configure(".", font=("Helvetica", f"{self.text_size}"))
+        self.style.configure(".", font=("Helvetica", f"{self.font_size}"))
 
         # A Boolean flag for the show/hide differences button.
         self.show_hide_diff = 0
@@ -245,35 +245,35 @@ class Lynx(tk.Tk):
             indicatoron=False,
             selectcolor="white",
             text="show/hide differences",
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             command=lambda: self.show_hide_differences(self.show_hide_diff),
         )
         self.highlighter_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.text_smaller_button = tk.Button(
             self.tool_frame,
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             text="A-",
             height=1,
             width=3,
-            command=lambda: self.change_text_size(0),
+            command=lambda: self.change_font_size(-1),
         )
         self.text_smaller_button.grid(row=0, column=4, sticky="e", pady=5)
 
         self.text_bigger_button = tk.Button(
             self.tool_frame,
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             text="A+",
             height=1,
             width=3,
-            command=lambda: self.change_text_size(1),
+            command=lambda: self.change_font_size(1),
         )
         self.text_bigger_button.grid(row=0, column=5, sticky="w", pady=5, padx=2)
 
         self.bold_button = tk.Button(
             self.tool_frame,
             text="B",
-            font=f"Helvetica {self.text_size} bold",
+            font=f"Helvetica {self.font_size} bold",
             height=1,
             width=3,
             command=lambda: self.make_text_bold(config, working_file),
@@ -283,7 +283,7 @@ class Lynx(tk.Tk):
         self.save_button = tk.Button(
             self.tool_frame,
             text="Save and Close",
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             command=lambda: self.save_and_close(),
         )
         self.save_button.grid(row=0, column=8, sticky="e", padx=5, pady=5)
@@ -295,7 +295,7 @@ class Lynx(tk.Tk):
         # review.
         try:
             self.counter_matches = ttk.Label(
-                self.tool_frame, text=count_msg, font=f"Helvetica {self.text_size}"
+                self.tool_frame, text=count_msg, font=f"Helvetica {self.font_size}"
             )
             self.counter_matches.grid(row=0, column=9, padx=10, sticky="e")
 
@@ -326,7 +326,7 @@ class Lynx(tk.Tk):
             )
 
             exec(
-                f'self.{column_title} = ttk.Label(self.record_frame, text="{col_header[0]}", font=f"Helvetica {self.text_size} bold")'
+                f'self.{column_title} = ttk.Label(self.record_frame, text="{col_header[0]}", font=f"Helvetica {self.font_size} bold")'
             )
 
             exec(
@@ -351,10 +351,10 @@ class Lynx(tk.Tk):
             header_separator = ttk.Separator(
                 self.record_frame, orient="horizontal", style="grey.TSeparator"
             )
-            if self.text_size != 10:
-                text_size_multiplier = 1 + ((self.text_size - 10) / 10)
+            if self.font_size != 10:
+                text_size_multiplier = 1 + ((self.font_size - 10) / 10)
 
-            elif self.text_size == 10:
+            elif self.font_size == 10:
                 text_size_multiplier = 1
 
             # Grid separator.
@@ -387,7 +387,7 @@ class Lynx(tk.Tk):
                 # Configure Text so that it is a specified width and
                 # font, and cannot be interacted with.
                 exec(
-                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}]) + 10, font=f"Helvetica {self.text_size} {self.text_bold}", state="disabled")'
+                    f'self.{col_header[0]}row{v}.config(width=len(working_file["{col_header[0]}"][{display_i}]) + 10, font=f"Helvetica {self.font_size} {self.text_bold}", state="disabled")'
                 )
 
                 # Grid the text label to the widget.
@@ -431,7 +431,7 @@ class Lynx(tk.Tk):
         self.match_button = tk.Button(
             self.button_frame,
             text="Match",
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             command=lambda: self.update_index(1),
             bg="DarkSeaGreen1",
         )
@@ -439,7 +439,7 @@ class Lynx(tk.Tk):
         self.non_match_button = tk.Button(
             self.button_frame,
             text="No more matches",
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             command=lambda: self.update_index(0),
             bg="light salmon",
         )
@@ -448,7 +448,7 @@ class Lynx(tk.Tk):
         self.back_button = tk.Button(
             self.button_frame,
             text="Back",
-            font=f"Helvetica {self.text_size}",
+            font=f"Helvetica {self.font_size}",
             command=lambda: self.go_back(),
         )
         self.back_button.grid(row=0, column=2, columnspan=1, padx=15, pady=10)
@@ -469,7 +469,7 @@ class Lynx(tk.Tk):
             self.comment_label = ttk.Label(
                 self.button_frame,
                 text="Comment:",
-                font=f"Helvetica {self.text_size} bold",
+                font=f"Helvetica {self.font_size} bold",
             )
             self.comment_label.grid(
                 row=info_button["row"] + 1, column=0, columnspan=1, sticky="e"
@@ -950,22 +950,9 @@ class Lynx(tk.Tk):
                 # Update the GUI.
                 self.update_gui(config, working_file)
 
-    def change_text_size(self, size_change: int) -> None:
-        """Adjust the size of the font.
-
-        Parameters
-        ----------
-        size_change : int
-            Will change the font size based on argument passed.
-        """
-        # Depending on the argument passed - increase/decrease font
-        # size/geometry parameters.
-        if size_change:
-            self.text_size += 1
-        else:
-            self.text_size -= 1
-
-        # Update the GUI.
+    def change_font_size(self, amount: int) -> None:
+        """Change the font size by a given amount."""
+        self.font_size += amount
         self.update_gui(config, working_file)
 
     def on_exit(self) -> None:
