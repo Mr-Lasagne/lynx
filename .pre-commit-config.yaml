@@ -10,7 +10,7 @@ repos:
         args: [--pytest-test-first]
       - id: trailing-whitespace
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.8.4
+    rev: v4.9.1
     hooks:
       - id: commitizen
       - id: commitizen-branch
